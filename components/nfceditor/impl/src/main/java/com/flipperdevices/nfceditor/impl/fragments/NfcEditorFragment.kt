@@ -1,5 +1,6 @@
 package com.flipperdevices.nfceditor.impl.fragments
 
+import android.app.Application
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -30,6 +31,7 @@ class NfcEditorFragment : ComposeFragment(), OnBackPressListener {
     private val showOnSaveDialogState = MutableStateFlow(false)
     private val viewModel by viewModels<NfcEditorViewModel> {
         NfcEditorViewModelFactory(
+            requireContext().applicationContext as Application,
             arguments?.getParcelable(EXTRA_FLIPPER_KEY)
                 ?: FlipperKey(
                     mainFile = FlipperFile(
@@ -56,7 +58,7 @@ class NfcEditorFragment : ComposeFragment(), OnBackPressListener {
                     onDismiss = { showOnSaveDialogState.update { false } },
                     onNotSave = { router.exit() },
                     onSave = { viewModel.onSave(router) },
-                    onSaveAs = {}
+                    onSaveAs = { viewModel.onSaveAs(router) }
                 )
             }
 

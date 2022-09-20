@@ -2,9 +2,13 @@ package com.flipperdevices.nfceditor.impl.composable
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.offset
+import androidx.compose.material.DropdownMenu
+import androidx.compose.material.DropdownMenuItem
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -43,7 +47,11 @@ fun ComposableNfcEditorScreen(nfcEditorViewModel: NfcEditorViewModel) {
     Column(modifier = Modifier.fillMaxSize()) {
         ComposableNfcEditorBar(localNfcEditorState.cardName, onBack = {
             router.exit()
-        }, onSave = { nfcEditorViewModel.onSave(router) })
+        }, onSave = {
+            nfcEditorViewModel.onSave(router)
+        }, onSaveAs = {
+            nfcEditorViewModel.onSaveAs(router)
+        })
         ComposableNfcEditor(
             modifier = Modifier.weight(1f),
             nfcEditorViewModel = nfcEditorViewModel,
@@ -55,7 +63,8 @@ fun ComposableNfcEditorScreen(nfcEditorViewModel: NfcEditorViewModel) {
             offsetForKeyboard = 0.dp
             val offset by animateDpAsState(offsetForKeyboard)
             ComposableHexKeyboard(
-                modifier = Modifier.offset(y = offset)
+                modifier = Modifier
+                    .offset(y = offset)
                     .background(LocalPallet.current.hexKeyboardBackground),
                 keyboardHeight = KEYBOARD_HEIGHT_DP.dp,
                 onClick = nfcEditorViewModel::onKeyInput
@@ -65,7 +74,32 @@ fun ComposableNfcEditorScreen(nfcEditorViewModel: NfcEditorViewModel) {
 }
 
 @Composable
-private fun ComposableNfcEditorBar(keyName: String?, onBack: () -> Unit, onSave: () -> Unit) {
+private fun ComposableSaveDropDown(
+    isVisible: Boolean, onSave: () -> Unit, onSaveAs: () -> Unit, onDismiss: () -> Unit
+) {
+    DropdownMenu(expanded = isVisible, onDismissRequest = onDismiss) {
+        DropdownMenuItem(onClick = {
+            onSave()
+            onDismiss()
+        }) {
+            Text(text = stringResource(R.string.nfc_popup_save))
+        }
+        DropdownMenuItem(onClick = {
+            onSaveAs()
+            onDismiss()
+        }) {
+            Text(text = stringResource(R.string.nfc_popup_save_as))
+        }
+    }
+}
+
+@Composable
+private fun ComposableNfcEditorBar(
+    keyName: String?,
+    onBack: () -> Unit,
+    onSave: () -> Unit,
+    onSaveAs: () -> Unit
+) {
     ComposableKeyScreenAppBar(
         startBlock = {
             ComposableBarBackIcon(it, onBack)
@@ -83,11 +117,19 @@ private fun ComposableNfcEditorBar(keyName: String?, onBack: () -> Unit, onSave:
             )
         },
         endBlock = {
-            ComposableBarSimpleText(
-                modifier = it,
-                text = stringResource(R.string.nfceditor_btn_save),
-                onClick = onSave
-            )
+            var dropDownVisible by remember {
+                mutableStateOf(false)
+            }
+            Box(modifier = it) {
+                ComposableBarSimpleText(
+                    modifier = Modifier,
+                    text = stringResource(R.string.nfceditor_btn_save),
+                    onClick = { dropDownVisible = true }
+                )
+                ComposableSaveDropDown(dropDownVisible, onSave, onSaveAs, onDismiss = {
+                    dropDownVisible = false
+                })
+            }
         }
     )
 }
