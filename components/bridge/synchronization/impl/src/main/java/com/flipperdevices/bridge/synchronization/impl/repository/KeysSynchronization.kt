@@ -79,6 +79,7 @@ class KeysSynchronizationImpl @Inject constructor(
 
         val mergedDiff = mergeDiffs(diffWithFlipper, diffWithAndroid)
         val diffForFlipper = mergedDiff.filter { it.source == DiffSource.ANDROID }
+            .sortedBy { it.action }
         val diffForAndroid = mergedDiff.filter { it.source == DiffSource.FLIPPER }
 
         info { "Changes for flipper $diffForFlipper" }
@@ -93,7 +94,7 @@ class KeysSynchronizationImpl @Inject constructor(
 
         info {
             "[Keys] Flipper, successful applied" +
-                " ${appliedKeysToFlipper.size} from ${diffForFlipper.size} changes"
+                    " ${appliedKeysToFlipper.size} from ${diffForFlipper.size} changes"
         }
 
         // Apply changes for Android
@@ -111,7 +112,7 @@ class KeysSynchronizationImpl @Inject constructor(
 
         info {
             "[Keys] Android, successful applied " +
-                "${appliedKeysToAndroid.size} from ${diffForAndroid.size} changes"
+                    "${appliedKeysToAndroid.size} from ${diffForAndroid.size} changes"
         }
 
         synchronizationRepository.markAsSynchronized(allKeysFromAndroid)
@@ -148,7 +149,7 @@ class KeysSynchronizationImpl @Inject constructor(
 
         check(calculatedHashOnFlipperSorted == calculatedHashOnAndroidSorted) {
             "Calculated hash should be equals. " +
-                "Flipper: $calculatedHashOnFlipperSorted. Android: $calculatedHashOnAndroidSorted"
+                    "Flipper: $calculatedHashOnFlipperSorted. Android: $calculatedHashOnAndroidSorted"
         }
 
         if (BuildConfig.DEBUG) {
@@ -156,7 +157,7 @@ class KeysSynchronizationImpl @Inject constructor(
 
             check(calculatedHashOnFlipperSorted == hashesFromFlipperSorted) {
                 "Calculated and real hash should be equal, please check it" +
-                    "Calculated: $calculatedHashOnFlipperSorted. Real: $hashesFromFlipperSorted"
+                        "Calculated: $calculatedHashOnFlipperSorted. Real: $hashesFromFlipperSorted"
             }
         }
 

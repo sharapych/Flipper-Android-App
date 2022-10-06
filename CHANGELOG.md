@@ -17,6 +17,7 @@
 - [FIX] Check total bytes from server(less 0 mean error from server)
 - [FIX] Whitespace in key name and upper first letter in edit screen
 - [FIX] Formatter convert bytes to string
+- [FIX] Delete file when renaming
 
 # 1.2.1
 
